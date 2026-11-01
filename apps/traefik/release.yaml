@@ -1,0 +1,65 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: traefik
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: traefik
+      version: "42.2.0"
+      interval: 12h
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: traefik
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    providers:
+      kubernetesGateway:
+        enabled: true
+      kubernetesIngress:
+        enabled: false
+    ingressClass:
+      enabled: false
+    gatewayClass:
+      enabled: true
+      name: traefik
+    gateway:
+      enabled: true
+      name: traefik-gateway
+      listeners:
+        web:
+          port: 8000
+          protocol: HTTP
+          # An HTTPRoute in any namespace can attach to this listener. The chart default
+          # accepts routes from the `traefik` namespace only.
+          namespacePolicy:
+            from: All
+        # A `websecure` listener needs `protocol: HTTPS` and `certificateRefs`. Add it
+        # after a certificate issuer exists.
+    # The node has no load balancer, so Traefik binds the node ports directly. The
+    # container keeps the unprivileged ports 8000 and 8443.
+    ports:
+      web:
+        port: 8000
+        hostPort: 80
+      websecure:
+        port: 8443
+        hostPort: 443
+    service:
+      enabled: false
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        memory: 256Mi
