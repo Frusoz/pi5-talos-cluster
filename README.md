@@ -45,6 +45,22 @@ passes that limit.
   filesystem, and `/var` is the one writable path that stays after a reboot.
 - Each chart must provide `linux/arm64` images.
 
+## Certificates
+
+`apps/cert-manager/ca.yaml` holds a self-signed root CA for the `home.lan` domain. The
+`home-lan-ca` ClusterIssuer signs each certificate of that domain. The private key stays
+in a Secret in the cluster, and this repository holds no key.
+
+The Traefik Gateway presents the `home-lan-tls` certificate on its `websecure`
+listener. That certificate covers `home.lan` and `*.home.lan`.
+
+A device trusts the domain after an import of the CA certificate:
+
+```sh
+kubectl -n cert-manager get secret home-lan-ca \
+  -o jsonpath='{.data.tls\.crt}' | base64 -d > home-lan-ca.crt
+```
+
 ## Commands
 
 ```sh

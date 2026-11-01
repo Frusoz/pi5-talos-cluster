@@ -1,0 +1,22 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: home-lan-tls
+  namespace: traefik
+spec:
+  secretName: home-lan-tls
+  commonName: home.lan
+  dnsNames:
+    - home.lan
+    - "*.home.lan"
+  duration: 2160h
+  renewBefore: 360h
+  privateKey:
+    algorithm: RSA
+    size: 2048
+    rotationPolicy: Always
+  issuerRef:
+    name: home-lan-ca
+    kind: ClusterIssuer
+    group: cert-manager.io

@@ -17,9 +17,6 @@ spec:
         namespace: traefik
   install:
     remediation:
-      # The chart creates a Gateway and a GatewayClass. Both kinds come from the
-      # `gateway-api-crds` Kustomization. A HelmRelease cannot declare `dependsOn` a
-      # Kustomization, so this release retries until the CRDs exist.
       retries: -1
   upgrade:
     cleanupOnFail: true
@@ -43,14 +40,15 @@ spec:
         web:
           port: 8000
           protocol: HTTP
-          # An HTTPRoute in any namespace can attach to this listener. The chart default
-          # accepts routes from the `traefik` namespace only.
           namespacePolicy:
             from: All
-        # A `websecure` listener needs `protocol: HTTPS` and `certificateRefs`. Add it
-        # after a certificate issuer exists.
-    # The node has no load balancer, so Traefik binds the node ports directly. The
-    # container keeps the unprivileged ports 8000 and 8443.
+        websecure:
+          port: 8443
+          protocol: HTTPS
+          namespacePolicy:
+            from: All
+          certificateRefs:
+            - name: home-lan-tls
     ports:
       web:
         port: 8000
