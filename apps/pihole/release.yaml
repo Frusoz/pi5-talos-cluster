@@ -24,6 +24,8 @@ spec:
       retries: 3
   values:
     hostNetwork: true
+    securityContext:
+      allowPrivilegeEscalation: true
     containerPorts:
       http: 8080
     pihole:
