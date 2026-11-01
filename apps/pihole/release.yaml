@@ -1,0 +1,61 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pihole
+  namespace: pihole
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: pihole
+      version: "2.2.1"
+      interval: 12h
+      sourceRef:
+        kind: HelmRepository
+        name: helmforge
+        namespace: pihole
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    hostNetwork: true
+    containerPorts:
+      http: 8080
+    pihole:
+      timezone: Europe/Rome
+      upstreamDns: "1.1.1.1;8.8.8.8"
+      listeningMode: ALL
+    dns:
+      preset: basic
+      # A record that points a name at an address on the network, such as the node:
+      # customRecords:
+      #   - "192.168.1.10 pi5.home.lan"
+      customRecords: []
+    persistence:
+      enabled: true
+      storageClass: local-path
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    serviceDns:
+      type: ClusterIP
+    serviceWeb:
+      type: ClusterIP
+    gateway:
+      enabled: true
+      parentRefs:
+        - name: traefik-gateway
+          namespace: traefik
+          sectionName: websecure
+      hostnames:
+        - pihole.home.lan
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        memory: 256Mi

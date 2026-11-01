@@ -15,10 +15,11 @@ To change the branch, the path, or the interval, edit the machine configuration 
 ```text
 apps/
   kustomization.yaml     # the list of applications
-  gateway-api/           # Gateway API CRDs, from the upstream Git repository
+  gateway-api-crds/      # Gateway API CRDs, from the upstream Git repository
   local-path-storage/    # storage provisioner
   cert-manager/          # certificate controller
   traefik/               # gateway controller
+  pihole/                # DNS server and ad blocker
 ```
 
 ## Applications
@@ -28,6 +29,7 @@ apps/
 | local-path-provisioner | `local-path-provisioner` | 0.0.38 |
 | cert-manager | `cert-manager` | v1.21.3 |
 | traefik | `traefik` | 42.2.0 |
+| pihole | `pihole` | 2.2.1 |
 
 One Kustomization applies the whole path in one pass. A release that needs another
 release first declares `dependsOn`.
@@ -59,6 +61,19 @@ A device trusts the domain after an import of the CA certificate:
 ```sh
 kubectl -n cert-manager get secret home-lan-ca \
   -o jsonpath='{.data.tls\.crt}' | base64 -d > home-lan-ca.crt
+```
+
+## Pi-hole
+
+Pi-hole answers DNS on port 53 at the node address. The pod uses `hostNetwork`, so each
+query keeps the address of the client. Traefik holds host port 80, so the web interface
+listens on port 8080.
+
+The web interface answers at `https://pihole.home.lan`. The chart writes a random
+password at the first install:
+
+```sh
+kubectl -n pihole get secret pihole -o jsonpath='{.data.password}' | base64 -d
 ```
 
 ## Commands
