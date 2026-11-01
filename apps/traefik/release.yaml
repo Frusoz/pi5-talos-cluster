@@ -6,11 +6,6 @@ metadata:
   namespace: traefik
 spec:
   interval: 30m
-  # The chart creates a Gateway and a GatewayClass. Both kinds come from the Gateway API
-  # CRDs that `traefik-crds` installs.
-  dependsOn:
-    - name: traefik-crds
-      namespace: traefik
   chart:
     spec:
       chart: traefik
@@ -22,7 +17,10 @@ spec:
         namespace: traefik
   install:
     remediation:
-      retries: 3
+      # The chart creates a Gateway and a GatewayClass. Both kinds come from the
+      # `gateway-api-crds` Kustomization. A HelmRelease cannot declare `dependsOn` a
+      # Kustomization, so this release retries until the CRDs exist.
+      retries: -1
   upgrade:
     cleanupOnFail: true
     remediation:
