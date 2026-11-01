@@ -1,0 +1,51 @@
+# --- OS / editor ---
+.DS_Store
+._*
+.idea/
+.vscode/
+*.swp
+*~
+
+# --- Omni / Talos / Kubernetes credentials ---
+omniconfig
+*.omniconfig
+talosconfig
+*.talosconfig
+kubeconfig
+*.kubeconfig
+_out/
+
+# --- Talos machine secrets ---
+secrets.yaml
+talos/secrets.yaml
+controlplane.yaml
+worker.yaml
+
+# --- SOPS / age / GPG keys ---
+*.agekey
+age.key
+age.agekey
+*.asc
+*.gpg
+key.txt
+!.sops.yaml
+
+# --- Decrypted material (never commit) ---
+*.dec.yaml
+*.dec.yml
+*.decrypted.yaml
+*.plain.yaml
+
+# --- Helm ---
+charts/*.tgz
+**/charts/*.tgz
+*.tgz
+.helm/
+
+# --- Local environment ---
+.env
+.env.*
+!.env.example
+*.local.yaml
+tmp/
+*.log

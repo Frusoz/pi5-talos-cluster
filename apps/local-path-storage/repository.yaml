@@ -1,0 +1,11 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: local-path-provisioner
+  namespace: local-path-storage
+spec:
+  interval: 12h
+  # Rancher publishes the chart source in its repository, but it hosts no chart index.
+  # containeroo packages the same chart from `rancher/local-path-provisioner`.
+  url: https://charts.containeroo.ch
