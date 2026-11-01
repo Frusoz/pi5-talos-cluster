@@ -6,6 +6,11 @@ metadata:
   namespace: traefik
 spec:
   interval: 30m
+  # The chart creates a Gateway and a GatewayClass. Both kinds come from the Gateway API
+  # CRDs that `traefik-crds` installs.
+  dependsOn:
+    - name: traefik-crds
+      namespace: traefik
   chart:
     spec:
       chart: traefik

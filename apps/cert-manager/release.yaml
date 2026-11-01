@@ -6,6 +6,11 @@ metadata:
   namespace: cert-manager
 spec:
   interval: 30m
+  # cert-manager reads the Gateway API CRDs at startup only. Without them, the pod with
+  # `gatewayAPI.enabled` fails.
+  dependsOn:
+    - name: traefik-crds
+      namespace: traefik
   chart:
     spec:
       chart: cert-manager
