@@ -72,6 +72,19 @@ Pi-hole answers DNS on port 53 at the node address. The pod uses `hostNetwork`, 
 query keeps the address of the client. The web interface listens on port 8080 on the
 node.
 
+One dnsmasq line answers the whole domain:
+
+```text
+address=/home.lan/192.168.1.185
+```
+
+`home.lan` and every name under it resolve to the node, so a new application behind the
+Traefik Gateway needs a HTTPRoute and no record here.
+
+Pi-hole binds the node address alone. `listeningMode: BIND` with `FTLCONF_dns_interface`
+keeps it off the wildcard address, because Talos host DNS holds `127.0.0.53:53` on the
+same node.
+
 The web interface answers at `https://pihole.home.lan`. The chart writes a random
 password at the first install:
 
