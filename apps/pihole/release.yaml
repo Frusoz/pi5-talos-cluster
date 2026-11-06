@@ -31,7 +31,10 @@ spec:
     pihole:
       timezone: Europe/Rome
       upstreamDns: "1.1.1.1;8.8.8.8"
-      listeningMode: ALL
+      listeningMode: BIND
+      extraEnv:
+        - name: FTLCONF_dns_interface
+          value: "end0"
     dns:
       preset: basic
       # A record that points a name at an address on the network, such as the node:

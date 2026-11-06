@@ -56,6 +56,9 @@ in a Secret in the cluster, and this repository holds no key.
 The Traefik Gateway presents the `home-lan-tls` certificate on its `websecure`
 listener. That certificate covers `home.lan` and `*.home.lan`.
 
+The Gateway carries that one listener. Traefik binds host port 443 and nothing else, so
+an `http://` address does not answer. Every address of this cluster starts `https://`.
+
 A device trusts the domain after an import of the CA certificate:
 
 ```sh
@@ -66,8 +69,8 @@ kubectl -n cert-manager get secret home-lan-ca \
 ## Pi-hole
 
 Pi-hole answers DNS on port 53 at the node address. The pod uses `hostNetwork`, so each
-query keeps the address of the client. Traefik holds host port 80, so the web interface
-listens on port 8080.
+query keeps the address of the client. The web interface listens on port 8080 on the
+node.
 
 The web interface answers at `https://pihole.home.lan`. The chart writes a random
 password at the first install:

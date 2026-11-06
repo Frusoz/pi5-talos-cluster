@@ -37,11 +37,9 @@ spec:
       enabled: true
       name: traefik-gateway
       listeners:
-        web:
-          port: 8000
-          protocol: HTTP
-          namespacePolicy:
-            from: All
+        # The chart declares a `web` listener on port 8000. This Gateway serves HTTPS
+        # only, so `null` drops it.
+        web: null
         websecure:
           port: 8443
           protocol: HTTPS
@@ -50,9 +48,9 @@ spec:
           certificateRefs:
             - name: home-lan-tls
     ports:
-      web:
-        port: 8000
-        hostPort: 80
+      # The chart declares a `web` port on 8000. The matching listener is gone, and a
+      # port with no listener fails the template, so `null` drops it too.
+      web: null
       websecure:
         port: 8443
         hostPort: 443

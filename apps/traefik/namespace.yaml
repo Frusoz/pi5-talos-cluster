@@ -4,7 +4,7 @@ kind: Namespace
 metadata:
   name: traefik
   labels:
-    # Traefik binds port 80 and port 443 on the node with `hostPort`. Talos enforces the
+    # Traefik binds port 443 on the node with `hostPort`. Talos enforces the
     # `baseline` Pod Security Standard, and `baseline` forbids hostPort. This namespace
     # needs the `privileged` level.
     pod-security.kubernetes.io/enforce: privileged
