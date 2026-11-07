@@ -30,7 +30,7 @@ spec:
       http: 8080
     pihole:
       timezone: Europe/Rome
-      upstreamDns: "1.1.1.1;8.8.8.8"
+      upstreamDns: "192.168.1.254"
       listeningMode: ALL
       #extraEnv:
       #  - name: FTLCONF_dns_interface

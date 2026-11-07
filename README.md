@@ -20,6 +20,7 @@ apps/
   cert-manager/          # certificate controller
   traefik/               # gateway controller
   pihole/                # DNS server and ad blocker
+  home-assistant/        # home automation
 ```
 
 ## Applications
@@ -30,6 +31,7 @@ apps/
 | cert-manager | `cert-manager` | v1.21.3 |
 | traefik | `traefik` | 42.2.0 |
 | pihole | `pihole` | 2.2.1 |
+| home-assistant | `home-assistant` | 3.3.2 |
 
 One Kustomization applies the whole path in one pass. A release that needs another
 release first declares `dependsOn`.
@@ -91,6 +93,26 @@ password at the first install:
 ```sh
 kubectl -n pihole get secret pihole -o jsonpath='{.data.password}' | base64 -d
 ```
+
+## Home Assistant
+
+Home Assistant answers at `https://home-assistant.home.lan`. The first visit opens the
+account setup page, and this repository holds no credential.
+
+The release keeps `/config` on a 10 GiB `local-path` volume. A StatefulSet owns that
+volume, so a `helm uninstall` leaves the claim in place.
+
+The pod stays on the cluster network. Discovery over mDNS and SSDP needs the host
+network, and the `home-assistant` namespace enforces the `baseline` Pod Security level,
+which forbids it. A device that answers on a fixed address is added by hand instead.
+
+Traefik terminates TLS, so Home Assistant sees the address of the gateway and not the
+address of the client. Settings -> System -> Network holds the trusted proxy list that
+restores the client address.
+
+The chart carries its own Namespace manifest. `apps/home-assistant/namespace.yaml`
+creates that namespace first, because the HelmRepository and the HelmRelease live in it,
+and the Helm ownership metadata on it lets the release adopt it.
 
 ## Commands
 

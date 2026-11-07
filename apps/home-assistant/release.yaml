@@ -1,0 +1,66 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: home-assistant
+  namespace: home-assistant
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: home-assistant
+      version: "3.3.2"
+      interval: 12h
+      sourceRef:
+        kind: HelmRepository
+        name: home-assistant
+        namespace: home-assistant
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    env:
+      - name: TZ
+        value: Europe/Rome
+      # The LinuxServer image runs Home Assistant as UID 1000.
+      - name: PUID
+        value: "1000"
+      - name: PGID
+        value: "1000"
+    service:
+      type: ClusterIP
+      port: 8123
+    # hostNetwork carries mDNS and SSDP discovery, and it asks for the `privileged`
+    # Pod Security level on this namespace. The Gateway serves the web interface, so
+    # the pod stays on the cluster network.
+    hostNetwork: false
+    persistence:
+      enabled: true
+      storageClassName: local-path
+      size: 10Gi
+    httproutes:
+      - enabled: true
+        name: home-assistant
+        namespace: home-assistant
+        hostname: home-assistant.home.lan
+        path: /
+        gateway:
+          name: traefik-gateway
+          namespace: traefik
+          sectionName: websecure
+        backend:
+          name: home-assistant
+          port: 8123
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        # The chart sets a CPU limit of 2. Every other release here limits memory alone,
+        # and `null` drops the default.
+        cpu: null
+        memory: 2Gi
